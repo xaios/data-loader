@@ -1,0 +1,11 @@
+{
+  "name": "@xaios/data-loader",
+  "author": "aizhifeng",
+  "description": "组件共享数据处理节流器",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xaios/data-loader.git"
+  }
+}
