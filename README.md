@@ -22,11 +22,24 @@ export default {
     // 加载函数返回一个 Promise，data 为对应加载数据的值
     DataLoader.Load('name', () => 'name').then(data => {}).catch(e => {})
 
+    // 举个例子，GetData 是一个返回 Promise 的请求方法（axios），可以如此改造
+    // GetData().then(data => {})
+    //
+    // DataLoader.Load('api', () => GetData()).then(data => {
+    //   这里返回的 data 与前面的 data 相同，但不会重复发起请求
+    // })
+
     // 加载操作可以返回 Promise，此时取 resolve 的内容为数据值
     // DataLoader.Load('name', () => new Promise)
 
     // 也可以使用 async，同样取返回值
     // DataLoader.Load('name', async () => {})
+
+    // 可以通过 Get 方法获取数据内容
+    // DataLoader.Get(name)
+
+    // 对象类型会返回 JSON.parse(JSON.stringify()) 处理的结果，如果需要原始数据，可以直接读内置对象
+    // DataLoader._data[name]
   }
 }
 ```

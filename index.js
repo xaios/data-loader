@@ -9,7 +9,7 @@ module.exports = class {
 
   Load(name, handle) {
     return new Promise((resolve, reject) => {
-      if (this._data[name] !== undefined) return resolve(this._data[name])
+      if (this._data[name] !== undefined) return resolve(this.Get(name))
       this.$on(`load_${name}`, resolve)
       this.$on(`warn_${name}`, e => {
         this._loading[name] = false
@@ -31,10 +31,14 @@ module.exports = class {
 
       this._data[name] = result
       this._loading[name] = false
-      this.$emit(`load_${name}`, result)
+      this.$emit(`load_${name}`, this.Get(name))
     } catch(e) {
       count-- ? this._Load(name, handle, count) : this.$emit(`warn_${name}`, e)
     }
+  }
+
+  Get(name) {
+    return typeof this._data[name] === 'object' ? JSON.parse(JSON.stringify(this._data[name])) : this._data[name]
   }
 
   $on(name, handle) {
