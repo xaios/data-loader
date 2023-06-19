@@ -38,6 +38,9 @@ export default {
     // 可以通过 Get 方法获取数据内容
     // DataLoader.Get(name)
 
+    // 可以通过 Del 方法删除已加载的内容
+    // DataLoader.Del(name)
+
     // 对象类型会返回 JSON.parse(JSON.stringify()) 处理的结果，如果需要原始数据，可以直接读内置对象
     // DataLoader._data[name]
   }

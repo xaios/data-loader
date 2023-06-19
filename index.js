@@ -41,6 +41,10 @@ module.exports = class {
     return typeof this._data[name] === 'object' ? JSON.parse(JSON.stringify(this._data[name])) : this._data[name]
   }
 
+  Del(name) {
+    delete this._data[name]
+  }
+
   $on(name, handle) {
     this._event_hub[name] = this._event_hub[name] || []
     this._event_hub[name].push(handle)
