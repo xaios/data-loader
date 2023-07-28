@@ -1,56 +1,58 @@
-module.exports = class {
-  _data = {}
-  _loading = {}
-  _event_hub = {}
+const EVENT = {}
+const DOING = {}
+const STORE = {}
 
-  constructor(count = 0) {
-    this._count = count
+module.exports = class {
+  constructor(time = 0) {
+    this.retry = time
   }
 
   Load(name, handle) {
     return new Promise((resolve, reject) => {
-      if (this._data[name] !== undefined) return resolve(this.Get(name))
-      this.$on(`load_${name}`, resolve)
+      if (STORE[name] !== undefined) return resolve(this.Get(name))
+
+      this.$on(`load_${name}`, () => {
+        DOING[name] = false
+        resolve(this.Get(name))
+      })
       this.$on(`warn_${name}`, e => {
-        this._loading[name] = false
+        DOING[name] = false
         reject(e)
       })
 
-      if (this._loading[name]) return
-
-      this._loading[name] = true
-      this._Load(name, handle, this._count)
+      if (DOING[name]) return
+      DOING[name] = true
+      this.LoadData(name, handle, this.retry)
     })
   }
 
-  async _Load(name, handle, count) {
+  async LoadData(name, handle, retry) {
     try {
-      let result = handle()
-      if (result instanceof Promise)
-        result = await result
-
-      this._data[name] = result
-      this._loading[name] = false
-      this.$emit(`load_${name}`, this.Get(name))
+      STORE[name] = await handle()
+      this.$emit(`load_${name}`)
     } catch(e) {
-      count-- ? this._Load(name, handle, count) : this.$emit(`warn_${name}`, e)
+      retry-- ? this.LoadData(name, handle, retry) : this.$emit(`warn_${name}`, e)
     }
   }
 
   Get(name) {
-    return typeof this._data[name] === 'object' ? JSON.parse(JSON.stringify(this._data[name])) : this._data[name]
+    return typeof STORE[name] === 'object' ? JSON.parse(JSON.stringify(STORE[name])) : STORE[name]
   }
 
   Del(name) {
-    delete this._data[name]
+    delete STORE[name]
+  }
+
+  Clear() {
+    Object.keys(STORE).forEach(i => this.Del(i))
   }
 
   $on(name, handle) {
-    this._event_hub[name] = this._event_hub[name] || []
-    this._event_hub[name].push(handle)
+    EVENT[name] = EVENT[name] || []
+    EVENT[name].push(handle)
   }
 
   $emit(name, ...params) {
-    this._event_hub[name]?.forEach(handle => handle(...params))
+    EVENT[name]?.forEach(handle => handle(...params))
   }
 }
